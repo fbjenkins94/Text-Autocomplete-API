@@ -159,13 +159,11 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
 		}
 		if(prefix[i] == n->getChar()) {
 			if(i == j) { //if were at the end of the prefix and
-			/**	if(n->word) {	//it is a word in the tree, then insert it
+				if(n->word) {	//it is a word in the tree, then insert it
 					pair<unsigned int, string> p;
 					p = make_pair(n->getFreq(), prefix);
 					pq->push(p);
-				}**/
-				vector<string> v{"HEY"};
-				return v;
+				}
 			}
 			n = n->middle;
 			++i;

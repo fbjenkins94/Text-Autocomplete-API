@@ -64,6 +64,6 @@ TEST(DictTrieTests, DELETE_TRIE) {
 	ASSERT_EQ(d.find("a"), true);
 	ASSERT_EQ(d.find("abc"), true);
 	vector<string> v = d.predictCompletions("abc", 2);
-	ASSERT_EQ(v[0], "HEY");
+	ASSERT_EQ(v[0], "abc");
 }
 
