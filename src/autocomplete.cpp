@@ -1,5 +1,19 @@
-/*
- * TODO: File Header
+/* Forest Jenkins
+ * A14747597
+ * fjenkins@ucsd.edu
+ * sources: piazza (peer and personal questions), lecture and discussion
+ * 	slides, class textbook, Focus on Data Structures by Richard L. 
+ * 	Stegman, cppreference.com for insight into pairs, priority queues,
+ * 	strings, and their functions. 
+ * 
+ * autocomplete.cpp is the main file of the program. The program mimics the 
+ * text autocomplete feature that one would encounter in a search engine such as
+ * google. autocomplete populates a ternary trie data structure from the file 
+ * DictionaryTrie.cpp with entries from a dictionary file, which the structure
+ * then sorts in alphabetical order. When the user is probed for a prefix, the
+ * file then connects to the DictionaryTrie's predictCompletions function in the
+ * DictoinaryTrie file. Said function populates a vector<string> structure with
+ * autocompleted strings and then returns them here. 
  */
 #include <fstream>
 #include <iostream>
