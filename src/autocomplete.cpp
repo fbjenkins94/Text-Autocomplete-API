@@ -74,6 +74,11 @@ int main(int argc, char** argv) {
         cin >> numberOfCompletions;
 
         // TODO
+	vector<string> v = dt->predictCompletions(word, numberOfCompletions);
+	for(int i = 0; i < v.size(); i++) {
+		cout<<v[i]<<endl;
+	}
+	
 
         cout << "Continue? (y/n)" << endl;
         cin >> cont;

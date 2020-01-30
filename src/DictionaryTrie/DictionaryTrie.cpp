@@ -26,7 +26,22 @@ class TrieNode {
 		}
 		int getFreq() {
 			return frequency;
-		}	
+		}
+		void setFreq(const int f) {
+			frequency = f;
+		}
+		
+};
+
+struct  Compare{
+public:
+	bool operator() (pair<int, string> & a, pair<int, string> & b) {
+		if(a.first == b.first) {
+			if(a.second.compare(b.second) <0 ) return false;
+			else if(b.second.compare(a.second) < 0) return true;
+		}
+		return a.first < b.first;
+	}
 };
 
 
@@ -40,8 +55,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
 
 	if(root == NULL) {
 		if(i != k) {
-			root = new TrieNode(word[i], freq, false);
-			++i;	
+			root = new TrieNode(word[i], 0, false);
 		}
 		else {
 			root = new TrieNode(word[i], freq, true);
@@ -54,6 +68,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
 		if(word[i] == n->getChar()) { //if string char == node letter
 			if(i==k && !(n->word)) { //if were at the end of the word and node != word
 				n->word = true;	//then turn node into a word
+				n->setFreq(freq);
 				return true;
 			}
 			if(i==k && n->word) { //if were at the end of the word and node == word
@@ -120,18 +135,20 @@ bool DictionaryTrie::find(string word) const {
 	return false;
 }
 
-void dfs(TrieNode* n, priority_queue<pair<unsigned int, string>> & pq, 
-		string s, unsigned int & numCompletions) {
+void dfs(TrieNode* n, 
+		priority_queue<pair<int, string>, 
+		vector<pair<int, string>> , Compare> & pq, 
+		string s) {
 	if(n) {
+		dfs(n->left, pq, s);
+		dfs(n->right, pq, s);
 		s += n->getChar();
+		dfs(n->middle, pq, s);
 		if(n->word) {
-			pair<unsigned int, string> p;
+			pair<int, string> p;
 			p = make_pair(n->getFreq(), s);
 			pq.push(p);
 		}
-		dfs(n->left, pq, s, numCompletions);
-		dfs(n->right, pq, s, numCompletions);
-		dfs(n->middle, pq, s, numCompletions);
 	}	
 }
 
@@ -139,7 +156,7 @@ void dfs(TrieNode* n, priority_queue<pair<unsigned int, string>> & pq,
 vector<string> DictionaryTrie::predictCompletions(string prefix,
                                                   unsigned int numCompletions) {
 	TrieNode * n = root;
-	priority_queue<pair<unsigned int, string>> *pq = new priority_queue<pair<unsigned int, string>>();
+ 	priority_queue<pair<int, string>, vector<pair<int, string>> , Compare> pq; 
 	/**
 	 *check if prefix is empty or tree is empty
 	 */
@@ -154,15 +171,15 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
 	int j = prefix.length()-1;
 	while(i <= j) {
 		if(n==NULL) { //if the prefix does not exist in the tree then return null vector
-			vector<string> v{"no"};
+			vector<string> v(0);
 			return v;
 		}
 		if(prefix[i] == n->getChar()) {
 			if(i == j) { //if were at the end of the prefix and
 				if(n->word) {	//it is a word in the tree, then insert it
-					pair<unsigned int, string> p;
+					pair<int, string> p;
 					p = make_pair(n->getFreq(), prefix);
-					pq->push(p);
+					pq.push(p);
 				}
 			}
 			n = n->middle;
@@ -175,25 +192,29 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
 			n = n->right;
 		}
 	}
-/**	string s = "HEY";
-	dfs(n, pq, s, numCompletions);
-	int k = pq.size();
-	if(numCompletions <= k) {
-		vector<string> v(numCompletions);
+
+	dfs(n, pq, prefix);
+
+	vector<string> v = vector<string>();
+	if(numCompletions <= pq.size()) {
 		for(int i = 0; i < numCompletions; i++) {
-			v.push_back(pq.top().second);
-			pq.pop();
+			if(!pq.empty()) {
+				v.push_back(pq.top().second);
+				pq.pop();
+			}
 		}
-		return v;
+	return v;
 	}
 	else {
-		vector<string> v(k);
-		for(int i = 0; i < k; i++) {
-			v.push_back(pq.top().second);
-			pq.pop();
+		int r = pq.size();
+		for(int i = 0; i < r; i++) {
+			if(!pq.empty()) {
+				v.push_back(pq.top().second);
+				pq.pop();
+			}
 		}
-		return v;
-	}**/
+	return v;
+	}
 
 }
 

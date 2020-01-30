@@ -1,0 +1,14 @@
+Reading file: data/large_freq_dict.txt
+Enter a prefix/pattern to search for:
+Enter a number of completions:
+against
+and then
+art
+air
+as well as
+available
+a year
+a great
+avait
+author
+Continue? (y/n)
