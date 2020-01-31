@@ -107,10 +107,12 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
 				//if were at the end of the word and node != word
 				n->word = true;	//then turn node into a word
 				n->setFreq(freq);
+				n = NULL;
 				return true;
 			}
 			if(i==wordIndex && n->word) { 
 				//if were at the end of the word and node == word
+				n = NULL;
 				return false;	//return false for duplicate word
 			}
 			if(!n->middle) {//if there is no middle node
@@ -144,7 +146,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
 			}
 		}
 	}
-
+	n = NULL;
 	return false;//return false if the word could not be added
 }
 /*
@@ -163,7 +165,9 @@ bool DictionaryTrie::find(string word) const {
 		}
 		if(word[i] == n->getChar()) {
 			if(i == wordLength) {
-				return n->word;
+				bool h = n->word;
+				n = NULL;
+				return h;
 			}
 			n = n->middle;
 			++i;
@@ -255,7 +259,7 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
 		}
 	}//end of the prefix has been found in DictionaryTrie
 	dfs(n, pq, prefix);//now find all autocompleted words 
-
+	n = NULL;
 	vector<string> v = vector<string>();
 	//if there are more (or equaL) autocompleted words than desired...
 	if(numCompletions <= pq.size()) {
@@ -303,5 +307,10 @@ DictionaryTrie::~DictionaryTrie() {
  * every TrieNode in the DictionaryTrie. Return void.
  */
 void DictionaryTrie::deleteAll(TrieNode * node) {
-	if(node != NULL) delete node;
+	if(node != NULL) {
+		node->left = NULL;
+		node->middle = NULL;
+		node->right = NULL;
+		delete node;
+	}
 }

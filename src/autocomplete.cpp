@@ -87,9 +87,8 @@ int main(int argc, char** argv) {
         cout << "Enter a number of completions:" << endl;
         cin >> numberOfCompletions;
 
-        // TODO
 	vector<string> v = dt->predictCompletions(word, numberOfCompletions);
-	for(int i = 0; i < v.size(); i++) {
+	for(unsigned int i = 0; i < v.size(); i++) {
 		cout<<v[i]<<endl;
 	}
 	
@@ -98,6 +97,7 @@ int main(int argc, char** argv) {
         cin >> cont;
         cin.ignore();
     }
+    dt->~DictionaryTrie();
     delete dt;
     return 0;
 }
