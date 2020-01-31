@@ -204,7 +204,7 @@ void dfs(TrieNode* n,
 			p = make_pair(n->getFreq(), s); //add it to a pair
 			pq.push(p);//push the word and frequency onto queue
 		}
-	}	
+	}
 }
 /*
  * predict Completions() accepts a string representing the prefix that wil be
@@ -307,10 +307,10 @@ DictionaryTrie::~DictionaryTrie() {
  * every TrieNode in the DictionaryTrie. Return void.
  */
 void DictionaryTrie::deleteAll(TrieNode * node) {
-	if(node != NULL) {
-		node->left = NULL;
-		node->middle = NULL;
-		node->right = NULL;
+	if(node) {
+		deleteAll(node->left);
+		deleteAll(node->right);
+		deleteAll(node->middle);
 		delete node;
 	}
 }
