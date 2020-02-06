@@ -1,5 +1,0 @@
-Reading file: data/unique_freq_dict.txt
-Enter a prefix/pattern to search for:
-Enter a number of completions:
-HELLO
-HERE 1

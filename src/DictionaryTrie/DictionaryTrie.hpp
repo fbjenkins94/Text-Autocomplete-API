@@ -64,7 +64,13 @@ class DictionaryTrie {
 		vector<string> predictCompletions(string prefix,
 				unsigned int numCompletions);
 		/*
-		 * 
+		 *declaration for predictUnderscores(). Accepts a string 
+		 * representing the underscored word to be autocorrected
+		 * with the autocorrected words of greatest frequency and
+		 * alphabetical order (if frequency is the same), and an
+		 * integer representing the number of autocorrected words to be
+		 * returned to the user. Returns a vector<string> filled with
+		 * autocorrected words. 
 		 */
 		vector<string> predictUnderscores(string pattern,
 				unsigned int numCompletions);

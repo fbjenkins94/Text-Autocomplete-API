@@ -92,19 +92,21 @@ int main(int argc, char** argv) {
 	for(int i = 0; i < word.length(); i++) {
 		if(word[i] == '_') {
 			underscore = true;
-			cout<<"HELLO"<<endl;
-			v = dt->predictUnderscores(word, numberOfCompletions);
-			cout<<"YOOOO"<<endl;
 			break;
 		}
 	}
 	if(underscore == false) {
 		v = dt->predictCompletions(word, numberOfCompletions);
+		for(int i = v.size()-1; i >= 0; --i) {
+			cout<<v[i]<<endl;
+		}
 	}
-	for(int i = v.size()-1; i >= 0; --i) {
-		cout<<v[i]<<endl;
+	else {
+		v = dt->predictUnderscores(word, numberOfCompletions);
+		for(int i = v.size()-1; i >= 0; --i) {
+			cout<<v[i]<<endl;
+		}
 	}
-
         cout << "Continue? (y/n)" << endl;
         cin >> cont;
         cin.ignore();

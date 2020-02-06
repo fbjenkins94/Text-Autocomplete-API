@@ -104,31 +104,68 @@ TEST(DictTrieTests, PREDICT_COMPLETIONS__ALPHABET_TEST) {
 	ASSERT_EQ(v2[6], "aaaa");
 	ASSERT_EQ(v2[7], "aaa");
 }
-
+//TEST FINDING MUTLIPLE UNDERSCORED AUTOCOMPLETED STRINGS
 TEST(DictTrieTests, PREDICT_UNDERSCORES_TEST) {
 	DictionaryTrie d;
-	d.insert("bb", 5);
-	d.insert("ba", 10);
-	d.insert("bc", 10);
-	d.insert("c", 10);
-	d.insert("a", 10);
-	d.insert("abbb", 1);
-	d.insert("abba", 20);
-	d.insert("aaca", 30);
-	d.insert("acaa", 40);
-	d.insert("accc", 50);
-	d.insert("a*&a", 60);
-	d.insert("a+#a", 70);
-	d.insert("azaa", 80);
-	d.insert("zaaa", 75);
-	vector<string> v = d.predictUnderscores("____", 7);
-	ASSERT_EQ(v.size(), 7);
-	ASSERT_EQ(v[0], "aaca");
-	ASSERT_EQ(v[1], "acaa");
-	ASSERT_EQ(v[2], "accc");
-	ASSERT_EQ(v[3], "a*&a");
-	ASSERT_EQ(v[4], "a+#a");
-	ASSERT_EQ(v[5], "zaaa");
-	ASSERT_EQ(v[6], "azaa");
-	//ASSERT_EQ(v[6], "azaa");
+	d.insert("abbb", 40);
+	d.insert("abba", 1);
+	d.insert("aaca", 90);
+	d.insert("bb", 1);
+	d.insert("ba", 1);
+	d.insert("bc", 1);
+	d.insert("d", 1);
+	d.insert("c", 1);
+	d.insert("z", 1);
+	d.insert("y", 1);
+	d.insert("acaa", 65);
+	d.insert("accc", 60);
+	d.insert("a*&a", 70);
+	d.insert("a+#a", 80);
+	d.insert("azaa", 100);
+	d.insert("zaaa", 90);
+
+	vector<string> v = d.predictUnderscores("_", 2);
+	ASSERT_EQ(v.size(), 2);
+	ASSERT_EQ(v[1], "c");
+	ASSERT_EQ(v[0], "d");
+
+	vector<string> y = d.predictUnderscores("__", 10);
+	ASSERT_EQ(y.size(), 3);
+	ASSERT_EQ(y[2], "ba");
+	ASSERT_EQ(y[1], "bb");
+	ASSERT_EQ(y[0], "bc");
+
+	vector<string> z = d.predictUnderscores("____", 9);
+	ASSERT_EQ(z.size(), 9);
+	ASSERT_EQ(z[0], "abba");
+	ASSERT_EQ(z[1], "abbb");
+	ASSERT_EQ(z[2], "accc");
+	ASSERT_EQ(z[3], "acaa");
+	ASSERT_EQ(z[4], "a*&a");
+	ASSERT_EQ(z[5], "a+#a");
+	ASSERT_EQ(z[6], "zaaa");
+	ASSERT_EQ(z[7], "aaca");
+	ASSERT_EQ(z[8], "azaa");
+
+	vector<string> x = d.predictUnderscores("a__a", 1);
+	ASSERT_EQ(x.size(), 1);
+	ASSERT_EQ(x[0], "azaa");
+
+	vector<string> a = d.predictUnderscores("_bb_", 100);
+	ASSERT_EQ(a.size(), 2);
+	ASSERT_EQ(a[0], "abba");
+	ASSERT_EQ(a[1], "abbb");
+}
+//send insert, find, and dfs empty strings
+TEST(DictTrieTests, RETURN_FALSE_EMPTY_TESTS) {
+	DictionaryTrie d;
+	ASSERT_EQ(d.find(""), false);
+	ASSERT_EQ(d.find("HEY! "), false);
+	ASSERT_EQ(d.insert("", 10), false);
+
+	vector<string> v = d.predictCompletions("", 1);
+	ASSERT_EQ(v.size(), 0);
+
+	vector<string>y = d.predictUnderscores("__", 1);
+	ASSERT_EQ(y.size(), 0);
 }
