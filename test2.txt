@@ -1,0 +1,16 @@
+Reading file: data/unique_freq_dict.txt
+Enter a prefix/pattern to search for:
+Enter a number of completions:
+song
+sing
+shog
+skeg
+Continue? (y/n)
+Enter a prefix/pattern to search for:
+Enter a number of completions:
+because
+believe
+balance
+breathe
+bedtime
+Continue? (y/n)

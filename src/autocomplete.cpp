@@ -81,17 +81,29 @@ int main(int argc, char** argv) {
 
     char cont = 'y';
     unsigned int numberOfCompletions;
+    vector<string> v = vector<string>();
+    bool underscore;
     while (cont == 'y') {
+	underscore = false;
         cout << "Enter a prefix/pattern to search for:" << endl;
         getline(cin, word);
         cout << "Enter a number of completions:" << endl;
         cin >> numberOfCompletions;
-
-	vector<string> v = dt->predictCompletions(word, numberOfCompletions);
-	for(unsigned int i = 0; i < v.size(); i++) {
+	for(int i = 0; i < word.length(); i++) {
+		if(word[i] == '_') {
+			underscore = true;
+			cout<<"HELLO"<<endl;
+			v = dt->predictUnderscores(word, numberOfCompletions);
+			cout<<"YOOOO"<<endl;
+			break;
+		}
+	}
+	if(underscore == false) {
+		v = dt->predictCompletions(word, numberOfCompletions);
+	}
+	for(int i = v.size()-1; i >= 0; --i) {
 		cout<<v[i]<<endl;
 	}
-	
 
         cout << "Continue? (y/n)" << endl;
         cin >> cont;
