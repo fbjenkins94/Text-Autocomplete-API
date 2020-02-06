@@ -20,8 +20,8 @@ class TrieNode {
 	private:
 		char letter;//letter of a dictionary word
 		int frequency;//use frequency of the dictionary word
+		unsigned int maxBelow = 0;
 	public:
-		bool word;//true = last letter of a word; false = no word
 		TrieNode * left; //left node of current (lesser letter value)
 		TrieNode * middle; //middle node of current (greater letter)
 		TrieNode * right; //right node of current (same word)
@@ -30,8 +30,8 @@ class TrieNode {
 		 * value, its integer frequency, and a boolean for whether or
 		 * not its a word. Initializes nodes to NULL.
 		 */
-		TrieNode(const char & c, const int & f, const bool & w) 
-				: letter(c), frequency(f), word(w) {
+		TrieNode(const char & c, const int & f, const int & mB) 
+				: letter(c), frequency(f), maxBelow(mB) {
 			left = middle = right = NULL;
 		}
 		/*
@@ -52,6 +52,12 @@ class TrieNode {
 		 */
 		void setFreq(const int f) {
 			frequency = f;
+		}
+		unsigned int getBelow() {
+			return maxBelow;
+		}
+		void setBelow(unsigned int b) {
+			maxBelow = b;
 		}
 };
 /*
@@ -103,16 +109,13 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
 	TrieNode * n = root;
 	while(i <= wordIndex) {
 		if(word[i] == n->getChar()) { //if string char == node letter
-			if(i==wordIndex && !(n->word)) { 
+			if(i==wordIndex && !(n->getFreq())) { 
 				//if were at the end of the word and node != word
-				n->word = true;	//then turn node into a word
 				n->setFreq(freq);
-				n = NULL;
 				return true;
 			}
-			if(i==wordIndex && n->word) { 
+			if(i==wordIndex && n->getFreq()) { 
 				//if were at the end of the word and node == word
-				n = NULL;
 				return false;	//return false for duplicate word
 			}
 			if(!n->middle) {//if there is no middle node
@@ -146,7 +149,6 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
 			}
 		}
 	}
-	n = NULL;
 	return false;//return false if the word could not be added
 }
 /*
@@ -165,9 +167,7 @@ bool DictionaryTrie::find(string word) const {
 		}
 		if(word[i] == n->getChar()) {
 			if(i == wordLength) {
-				bool h = n->word;
-				n = NULL;
-				return h;
+				return n->getFreq();
 			}
 			n = n->middle;
 			++i;
@@ -193,17 +193,22 @@ bool DictionaryTrie::find(string word) const {
 void dfs(TrieNode* n, 
 		priority_queue<pair<int, string>, 
 		vector<pair<int, string>> , Compare> & pq, 
-		string s) {
+		vector<char> & v) {
 	if(n) { //if node != NULL
-		dfs(n->left, pq, s); //traverse the left subtree
-		dfs(n->right, pq, s);//traverse the right subtree
-		s += n->getChar();//add the nodes's char to the prefix
-		dfs(n->middle, pq, s);//traverse the middle subtree
-		if(n->word) {//if it is a word
+		dfs(n->left, pq, v); //traverse the left subtree
+		dfs(n->right, pq, v);//traverse the right subtree
+		v.push_back(n->getChar());//add the nodes's char to the prefix
+		dfs(n->middle, pq, v);//traverse the middle subtree
+		if(n->getFreq()) {//if it is a word
+			string s = "";
+			for(int i = 0; i < v.size(); i++) {
+				s += v[i];
+			}
 			pair<int, string> p;
 			p = make_pair(n->getFreq(), s); //add it to a pair
 			pq.push(p);//push the word and frequency onto queue
 		}
+		v.pop_back();
 	}
 }
 /*
@@ -235,14 +240,16 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
 	 */
 	int i = 0;
 	int wordLength = prefix.length()-1;
+	vector<char> cv = vector<char>();
 	while(i <= wordLength) {
 		if(n==NULL) { //if the prefix does not exist in the tree then return null vector
 			vector<string> v(0);
 			return v;
 		}
 		if(prefix[i] == n->getChar()) {
+			cv.push_back(n->getChar());
 			if(i == wordLength) { //if were at the end of the prefix and
-				if(n->word) {	//it is a word in the tree, then insert it
+				if(n->getFreq()) {	//it is a word in the tree, then insert it
 					pair<int, string> p;
 					p = make_pair(n->getFreq(), prefix);
 					pq.push(p);
@@ -258,8 +265,7 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
 			n = n->right;
 		}
 	}//end of the prefix has been found in DictionaryTrie
-	dfs(n, pq, prefix);//now find all autocompleted words 
-	n = NULL;
+	dfs(n, pq, cv);//now find all autocompleted words 
 	vector<string> v = vector<string>();
 	//if there are more (or equaL) autocompleted words than desired...
 	if(numCompletions <= pq.size()) {
@@ -284,12 +290,86 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
 	}
 
 }
+
+void dfsUnderscores(TrieNode* n, 
+		priority_queue<pair<int, string>, 
+		vector<pair<int, string>> , Compare> & pq, 
+		vector<char> & v, string & word) {
+	if(n) { //if node != NULL
+		if(v.size() != word.length()) {
+			if(word[v.size()] == '_') {
+				dfsUnderscores(n->left, pq, v, word);
+				dfsUnderscores(n->right, pq, v, word);
+				v.push_back(n->getChar());
+				dfsUnderscores(n->middle, pq, v, word);
+			}
+			else if(word[v.size()] == n->getChar()) {
+				v.push_back(n->getChar());
+				dfsUnderscores(n->middle, pq, v, word);
+			}
+			else if(word[v.size()] > n->getChar()) {
+				dfsUnderscores(n->right, pq, v, word);
+				v.push_back(n->getChar());
+			}
+			else if(word[v.size()] < n->getChar()) {
+				dfsUnderscores(n->left, pq, v, word);
+				v.push_back(n->getChar());
+			}
+		}
+		if(v.size() == word.length() && n->getFreq() != 0) {
+			if((word[v.size()-1] == '_') || word[v.size()-1] == v[v.size()-1]) {
+				string s = "";
+				for(int i = 0; i < v.size(); i++) {
+					s += v[i];
+				}
+				pair<int, string> p;
+				p = make_pair(n->getFreq(), s); //add it to a pair
+				pq.push(p);//push the word and frequency onto queue
+			}
+		}
+		if(v.size()) {
+			v.pop_back();
+		}
+	}
+}
 /*
  * 
  */
 std::vector<string> DictionaryTrie::predictUnderscores(
     string pattern, unsigned int numCompletions) {
-    return {};
+	TrieNode * n = root;
+ 	priority_queue<pair<int, string>, vector<pair<int, string>> , Compare> pq; 
+
+	if(pattern == "" || n == NULL) {
+		vector<string> v{};
+		return v;
+	}
+
+	vector<char> cv = vector<char>();
+	dfsUnderscores(n, pq, cv, pattern);
+
+	vector<string> v = vector<string>();
+	//if there are more (or equaL) autocompleted words than desired...
+	if(numCompletions <= pq.size()) {
+		for(int i = 0; i < numCompletions; i++) {
+			if(!pq.empty()) {//don't cause segfault
+				v.push_back(pq.top().second);
+				pq.pop();
+			}
+		}
+	return v;
+	}
+	//if there are less autocompleted words than desired
+	else {
+		int r = pq.size();
+		for(int i = 0; i < r; i++) {
+			if(!pq.empty()) {//don't cause segfault
+				v.push_back(pq.top().second);
+				pq.pop();
+			}
+		}
+	return v;
+	}
 }
 /*
  * ~DictionaryTrie() is the DictionaryTrie's destructor method. In order

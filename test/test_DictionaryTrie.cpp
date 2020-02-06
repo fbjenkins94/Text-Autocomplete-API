@@ -105,3 +105,30 @@ TEST(DictTrieTests, PREDICT_COMPLETIONS__ALPHABET_TEST) {
 	ASSERT_EQ(v2[7], "acd");
 }
 
+TEST(DictTrieTests, PREDICT_UNDERSCORES_TEST) {
+	DictionaryTrie d;
+	/**d.insert("a", 10);
+	d.insert("bb", 20);
+	d.insert("ba", 10);
+	d.insert("bc", 10);
+	d.insert("c", 10);**/
+	d.insert("abbb", 10);
+	d.insert("abba", 10);
+	d.insert("aaca", 10);
+	d.insert("acaa", 10);
+	d.insert("accc", 10);
+	d.insert("a*&a", 10);
+	d.insert("a+#a", 10);
+	d.insert("azaa", 10);
+	d.insert("zaaa", 10);
+	vector<string> v = d.predictUnderscores("____", 7);
+	ASSERT_EQ(v.size(), 7);
+	ASSERT_EQ(v[0], "a*&a");
+	ASSERT_EQ(v[1], "a+#a");
+	ASSERT_EQ(v[2], "aaca");
+	ASSERT_EQ(v[3], "abba");
+	ASSERT_EQ(v[4], "abbb");
+	ASSERT_EQ(v[5], "acaa");
+	ASSERT_EQ(v[6], "accc");
+	//ASSERT_EQ(v[6], "azaa");
+}
